@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energizen</title>
+    <link rel="icon" type="image/x-icon" href="./recursos/imagenes/iconoTab.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="./css/style.css">    
+    <script src="./js/filejs.js"></script>
+</head>
+<div class="header">
+    <div class="menu-toggle">&#9776;</div> <!-- Hamburger menu icono -->
+    <ul>
+        <li id="notUnderline"><a href="#Inicio" id="homeLink"><img id="logoHome" src="./recursos/imagenes/logoHome.png" ></a></li>   
+        <li><a href="index.html#Inicio">Inicio</a></li>
+        <li><a href="index.html#Productos">Productos</a></li>
+        <li><a href="index.html#Promos">Promos</a></li>
+        <li><a href="./nosotros.html">Nosotros</a></li>
+        <li><a href="index.html#Contactanos">Contactanos</a></li>
+    </ul>
+</div>
+<body>
+<div class="contCatProd" style="background-color: palevioletred">
+    <div class="row">
+        <div class="col-lg-3 col-md-6 col-12 custom-width-29">
+            <div class="sidebar">
+                <h2 class="mb-4" style="font-style: italic;color: rgb(238, 85, 210);">CATEGORIAS</h2>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="#" onclick="showProducts('zapatillas')">
+                            <i class="bi bi-cart3"></i> Zapatillas
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" onclick="showProducts('ropadeportes')">
+                            <i class="bi bi-cart3"></i> Ropa deportes
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" onclick="showProducts('ropa-fitness')">
+                            <i class="bi bi-cart3"></i> Ropa Fitness
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-6 col-12 custom-width-55">
+            <div  class="products-container row row-cols-1 row-cols-md-2 row-cols-lg-3" id="productsContainer">
+                <!-- AQUI SE MOSTRARAN LAS CARDS CON PRODUCTOS -->
+            </div>
+        </div>
+    </div>
+</div>
+<br><br><br><br>
+<footer class="footer">
+    <div class="section footer-top bg-dark has-bg-image">
+        <div class="containerFooter">
+            <div class="footer-brand">
+                <div id="logoEnFooter">
+                    <a href="#Inicio" id="homeLink"><img id="logoHomeFooter" src="./recursos/imagenes/logoHome.png"></a>
+                </div>                             
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="index.html#Inicio"><i class="bi bi-house"></i> Inicio</a></li>
+                    <li><a href="index.html#Productos"><i class="bi bi-bag"></i> Productos</a></li>
+                    <li><a href="./nosotros.html"><i class="bi bi-people"></i> Nosotros</a></li>
+                </ul>
+            </div>
+            <div class="social-links">
+                <a href="https://www.instagram.com"><i class="bi bi-instagram"></i></a>
+                <a href="https://www.facebook.com"><i class="bi bi-facebook"></i></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const menu = document.querySelector('.header ul');
+
+    // esconde menu inicialmente
+    menu.classList.add('hidden-menu');
+
+    menuToggle.addEventListener('click', function() {
+        menu.classList.toggle('hidden-menu');
+    });
+
+    // cierra menu
+    document.addEventListener('click', function(e) {
+        if (!menu.contains(e.target) && !menuToggle.contains(e.target)) {
+            menu.classList.add('hidden-menu');
+        }
+    });
+
+    // cierra menu cuando elige
+    const menuItems = document.querySelectorAll('.header ul li a');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            menu.classList.add('hidden-menu');
+        });
+    });
+
+    // cierra menu cuando scrollea
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        section.addEventListener('wheel', function() {
+            menu.classList.add('hidden-menu');
+        });
+    });
+});
+
+    const productsData = {
+        'zapatillas': [
+            { name: 'Nike Peg', description: 'Descripción corta', price: '$AR5000', image: 'https://cdn.pixabay.com/photo/2012/12/21/10/07/sneakers-71623_1280.jpg' },
+            { name: 'Reebok Z', description: 'Descripción corta', price: '$6000', image: 'https://cdn.pixabay.com/photo/2014/04/25/20/34/sneakers-332128_1280.jpg' },
+            { name: 'Adidas Run', description: 'Descripción corta', price: '$7000', image: 'https://cdn.pixabay.com/photo/2017/07/30/15/49/adidas-2554690_1280.jpg' }
+        ],
+        'ropadeportes': [
+            { name: 'Pantalón 1', description: 'Descripción corta', price: '$AR3000', image: 'https://cdn.pixabay.com/photo/2018/05/21/09/55/tennis-3417792_1280.jpg' },
+            { name: 'Pantalón 2', description: 'Descripción corta', price: '$AR4000', image: 'https://cdn.pixabay.com/photo/2014/06/09/17/34/jog-365538_1280.jpg' },
+            { name: 'Pantalón 3', description: 'Descripción corta', price: '$AR5000', image: 'https://media.istockphoto.com/id/1199866137/it/foto/camicie-colorate-della-squadra-sportiva-appese-ai-binari-dei-vestiti.jpg?s=2048x2048&w=is&k=20&c=aEyzOP4NFV2_cdZEyRW6yoNHJvm7SEbcNbXRqTW2i5I=' }
+        ],
+        'ropa-fitness': [
+            { name: 'Camiseta 1', description: 'Descripción corta', price: '$AR2000', image: 'https://cdn.pixabay.com/photo/2019/04/14/17/54/woman-4127336_1280.jpg' },
+            { name: 'Camiseta 2', description: 'Descripción corta', price: '$AR2500', image: 'https://cdn.pixabay.com/photo/2016/03/27/23/08/woman-1284656_1280.jpg' },
+            { name: 'Leggings 1', description: 'Descripción corta', price: '$AR3500', image: 'https://cdn.pixabay.com/photo/2022/02/27/06/33/man-7036709_1280.jpg' }
+        ]
+    };
+
+    
+    function showProducts(category) {
+        const productsContainer = document.getElementById('productsContainer');
+        productsContainer.innerHTML = ''; // limpia productos previos
+
+        const products = productsData[category];
+        products.forEach(product => {
+            const card = `
+                <div class="product-card">
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p><strong>Precio:</strong> ${product.price}</p>
+                    <button class="btn btn-primary">Comprar</button>
+                </div>
+            `;
+            productsContainer.innerHTML += card;
+        });
+    }
+</script>
+
+</body>
+</html>

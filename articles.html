@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de artículos</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <a href="./index.html"><i class="bi bi-house"></i> Volver a inicio</a>
+        <h2>Gestión de artículos</h2>        
+        <!-- Inputs para relleno en tabla de categorìas -->
+        <div id="create-update-fields-art">
+            <div class="mb-3" id="categoryInput">
+                <label for="articleName" class="form-label">Nombre artículo:</label>
+                <input type="text" class="form-control" id="articleName">
+            </div>
+            <div class="mb-3" id="IDInput">
+                <label for="articleIDnumber" class="form-label">ID Categoría:</label>
+                <input type="number" class="form-control" id="articleIDnumber">
+            </div>
+            <div class="mb-3" id="IDInputTab">
+                <label for="articleIDnumbercat" class="form-label">ID Tabla:</label>
+                <input type="number" class="form-control" id="articleIDnumbercat">
+            </div>
+            <div class="mb-3" id="descriptionInput">                
+                <label for="articleDescription" class="form-label">Descripción Articulo:</label>
+                <input type="text" class="form-control" id="articleDescription">
+            </div>
+            <div class="mb-3" id="priceInput">
+                <label for="articlePrice" class="form-label">Precio Artículo:</label>
+                <input type="text" class="form-control" id="articlePrice">
+            </div>
+        </div>
+        <!-- Botones de operaciones -->
+        <div class="mb-3">
+            <button class="btn btn-primary mr-2" id="getAllArticles">Info Todo</button>
+            <button class="btn btn-primary mr-2" id="getArticleByID">Info per ID</button>
+            <button class="btn btn-success mr-2" id="createArticle">Crea artículo</button>
+            <button class="btn btn-warning mr-2" id="updateArticle">Actualizar Art por ID</button>
+            <!--<button class="btn btn-danger" id="deleteArticle">Borrar cat por ID</button>-->
+        </div>
+        <!-- Confirmation button -->
+        <div id="confirmationButton" style="display: none;">
+            <button class="btn btn-primary" id="confirmAction">Confirma</button>
+            <button class="btn btn-primary" id="confirmGetCategory">Confirma Infor por ID</button>
+        </div>        
+        <hr id="divisor">
+        <h3 id="titleList">Lista de artículos</h3>
+        <ul id="categories-list" class="list-group">
+            <!-- Articulos son agregados dinamicamente en esta secciòn -->
+        </ul>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const BASE_URL = 'http://localhost:3000';
+        // Function to fetch all categories
+        function getAllArticles() {
+            $.ajax({
+                url: `${BASE_URL}/articles`,
+                method: 'GET',
+                success: function(categories) {
+                    $('#categories-list').empty();
+                    categories.forEach(category => {
+                        $('#categories-list').append(`<li class="list-group-item">ID:${category.id}- ID CAT: ${category.id_category}-Articulo :${category.name}-Desc : ${category.description}-Precio : ${category.price}$AR
+                            <button class="btn btn-danger btn-sm float-right delete-category" data-id="${category.id}">Eliminar</button>
+                        </li>`);
+                    });
+                    clearInputFields();                    
+                },
+                error: function(xhr, status, error) {
+                    alert("Error al fetchar articulos");
+                }
+            });
+        }
+        // Función para obtener la categoría por ID
+        function getArticleByID(id) {
+            $.ajax({
+                url: `${BASE_URL}/articles/${id}`,
+                method: 'GET',
+                success: function(category) {
+                    $('#categories-list').empty();
+                    if (category.length > 0) {
+                        $('#categories-list').append(`<li class="list-group-item">ID: ${category[0].id}ID CAT: ${category[0].id_category}-Articulo :${category[0].name} -Articulo : ${category[0].description  }  -Precio : ${category[0].price  }
+                            <button class="btn btn-danger btn-sm float-right delete-category" data-id="${category[0].id_category}">Eliminar</button>
+                        </li>`);
+                        clearInputFields();
+                    } else {
+                        $('#categories-list').append('<li class="list-group-item">Artìculo no encontrado</li>');
+                        clearInputFields();
+                    }                    
+                },
+                error: function(xhr, status, error) {
+                    alert("Error al fetchar la data de articulos");
+                    clearInputFields();
+                }
+            });
+        }
+
+         // Función para actualizar la página y mantener el estado
+         function refresh() {
+            // Guardar estado en sessionStorage
+            const state = {
+                createUpdateFieldsVisible: $('#create-update-fields-art').is(':visible'),
+                confirmationButtonVisible: $('#confirmationButton').is(':visible'),
+                confirmActionVisible: $('#confirmAction').is(':visible'),
+                confirmGetCategoryVisible: $('#confirmGetCategory').is(':visible'),
+                articleName: $('#articleName').val(),
+                articleIDnumber: $('#articleIDnumber').val(),
+                articleDescription: $('#articleDescription').val(),
+            };
+            sessionStorage.setItem('state', JSON.stringify(state));
+            
+            setTimeout(function () {
+                location.reload();
+            }, 1000);
+        }
+
+        // Función para restaurar el estado de sessionStorage
+        function restoreState() {
+            const state = JSON.parse(sessionStorage.getItem('state'));
+            if (state) {
+                if (state.createUpdateFieldsVisible) {
+                    $('#create-update-fields-art').show();
+                }
+                if (state.confirmationButtonVisible) {
+                    $('#confirmationButton').show();
+                }
+                if (state.confirmActionVisible) {
+                    $('#confirmAction').show();
+                }
+                if (state.confirmGetCategoryVisible) {
+                    $('#confirmGetCategory').show();
+                }
+                $('#articleName').val(state.articleName);
+                $('#articleIDnumber').val(state.articleIDnumber);
+                $('#articleDescription').val(state.articleDescription);
+                // Limpiar la sessionStorage despuès restaurar
+                sessionStorage.removeItem('state');
+            }
+        }
+        // Funciòn para crear nueva categorìa
+        function createArticle() {            
+            $('#create-update-fields-art').show();  
+            $('#confirmationButton').show();             
+            $('#confirmGetCategory').hide();
+
+            //Gestión botòn confirmar
+            $('#confirmAction').off().click(function() {
+                const categoryData = {
+                    name: $('#articleName').val(),
+                    id_category: $('#articleIDnumber').val(), 
+                    description: $('#articleDescription').val(),
+                    price: $('#articlePrice').val()
+                };
+
+                $.ajax({
+                    url: `${BASE_URL}/articles`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(categoryData),
+                    success: function(response) {
+                        alert(response.mensaje);  // mostrar èxito en operaciòn
+                        getAllArticles();  // Refresh lista
+                        $('#confirmationButton').hide();   // Hide confirmation button
+                        clearInputFields();
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Error al crear artìculo. Verificar datos insertados o si existe id_categoria");
+                    }
+                });
+            });
+        }
+
+        // Function actualizar por ID
+        function updateArticleByID(id) {
+            const categoryData = {
+                name: $('#articleName').val(),
+                id_category: $('#articleIDnumber').val(), 
+                description: $('#articleDescription').val(),
+                price: $('#articlePrice').val()
+            };
+
+            $.ajax({
+                url: `${BASE_URL}/articles/${id}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(categoryData),
+                success: function(response) {
+                    alert(response.mensaje); // mostrar èxito en operaciòn
+                    getAllArticles(); // Refresh lista
+                    hideConfirmationButtons(); // oculta botones en  #confirmationButton
+                    clearInputFields();
+                    window.location.reload(true); //
+                },
+                error: function(xhr, status, error) {
+                    alert("Error al actualizar articulo.");
+                }
+            });
+        }
+
+        // Function borrar by ID
+        function deleteArticleByID(id) {
+            $.ajax({
+                url: `${BASE_URL}/articles/${id}`,
+                method: 'DELETE',
+                success: function(response) {
+                    alert(response.mensaje);  // mostrar èxito en operaciòn
+                    getAllArticles();  // Refresh lista
+                    hideConfirmationButtons(); // oculta botones en  #confirmationButton
+                    clearInputFields();
+                },
+                error: function(xhr, status, error) {
+                    alert("Error al borrar articulo");
+                }
+            });
+        }
+        // Function para limpiar campos de entrada
+        function clearInputFields() {
+            $('#articleName').val('');
+            $('#articleIDnumber').val('');
+            $('#articleDescription').val('');
+        }
+
+        // Function para resetearestado antes de una operaciòn
+        function resetState() {
+            clearInputFields();
+            hideConfirmationButtons();
+            $('#create-update-fields-art').hide();
+        }
+
+        function hideConfirmationButtons() {
+            $('#confirmAction').hide();
+            $('#confirmGetCategory').hide();
+            $('#confirmationButton').hide();
+        }
+
+        
+    
+        // Event listeners para botones e inicio pagin
+        $(document).ready(function() {
+            const idInput = document.getElementById('IDInput');            
+            const idInputTab = document.getElementById('IDInputTab');
+            const descInput = document.getElementById('descriptionInput');
+            const catInput = document.getElementById('categoryInput');
+            const priInput = document.getElementById('priceInput');
+            const divis = document.getElementById('divisor');
+            const title = document.getElementById('titleList');
+            const catList = document.getElementById('categories-list');
+
+
+            descInput.style.display = 'none';
+            catInput.style.display = 'none';
+            idInput.style.display = 'none';
+            idInputTab.style.display = 'none';
+            priInput.style.display = 'none';
+            hideListCategories()
+
+            $('#getAllArticles').click(function() {
+                getAllArticles();
+                hideConfirmationButtons(); // oculta botones en  #confirmationButton
+                hideAllInputs(); 
+                divis.style.display = 'block';
+                title.style.display = 'block';
+                catList.style.display = 'block';
+            });
+
+            $('#getArticleByID').click(function() {
+                hideConfirmationButtons(); // oculta botones en  #confirmationButton
+                descInput.style.display = 'none';
+                catInput.style.display = 'none';
+                idInput.style.display = 'none';
+                hideListCategories()
+                
+                idInputTab.style.display = 'block';
+                $('#confirmGetCategory').show(); // 
+                $('#confirmationButton').show(); 
+                
+            });
+
+            $('#createArticle').click(function() {                
+                location.href = location.href + '?createArticle=true';                
+            });
+
+            // Gestión de la carga de events
+            if (location.search.indexOf('createArticle=true') !== -1) {
+                createArticle();
+                showAllInputs(); 
+                // Remove the query parameter to prevent infinite loop
+                history.replaceState(null, null, location.href.split('?')[0]);
+            }
+
+            $('#updateArticle').click(function() {
+                hideConfirmationButtons(); // oculta botones en  #confirmationButton
+                $('#confirmAction').show(); 
+                $('#confirmationButton').show(); 
+                showAllInputs(); 
+                hideListCategories();
+                
+            });
+
+            // Delegación de eventos para los botones de eliminación dentro de la lista de categorías
+            $('#categories-list').on('click', '.delete-category', function() {
+                const id = $(this).data('id'); //Obtener el ID  del atributo data-id
+                deleteArticleByID(id);
+            });
+
+            $('#confirmGetCategory').click(function() {
+                //const id = $('#articleIDnumber').val();
+                const id = $('#articleIDnumbercat').val();
+                getArticleByID(id);
+                $('#confirmationButton').hide();
+                showListCategories();
+            });
+
+            $('#confirmAction').click(function() {
+                const id = $('#articleIDnumbercat').val();  
+                updateArticleByID(id);
+            });
+
+            
+            function hideConfirmationButtons() {
+                $('#confirmAction').hide();
+                $('#confirmGetCategory').hide();
+                $('#confirmationButton').hide();
+            }
+
+            function hideListCategories(){
+                divis.style.display = 'none';
+                title.style.display = 'none';
+                catList.style.display = 'none';
+            }
+
+            function showListCategories(){
+                divis.style.display = 'block';
+                title.style.display = 'block';
+                catList.style.display = 'block';
+            }
+
+            function hideAllInputs(){
+                descInput.style.display = 'none';
+                catInput.style.display = 'none';
+                idInput.style.display = 'none';
+                priInput.style.display = 'none';
+            }
+            function showAllInputs(){
+                descInput.style.display = 'block';
+                catInput.style.display = 'block';
+                idInput.style.display = 'block';
+                idInputTab.style.display ='block';
+                priInput.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

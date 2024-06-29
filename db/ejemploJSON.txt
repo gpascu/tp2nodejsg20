@@ -1,0 +1,29 @@
+{
+    "category": "Calzado informal",
+    "id_category": 5,
+    "description": "Calzado informal general"
+}
+
+{
+    "name": "Zapatillas Running",
+    "description": "Zapatillas ligeras running",
+    "price": 5999.99,
+    "id_category": 1
+}
+
+ejemplo query
+SELECT 
+    c.id AS category_id,
+    c.category AS category_name,
+    c.description AS category_description,    
+    a.name AS article_name,
+    a.description AS article_description,
+    a.price AS article_price
+FROM 
+    categories_db.categories c
+JOIN 
+    categories_db.articles a ON c.id_category = a.id_category
+WHERE 
+    c.id_category = 1
+AND 
+    a.id_category = 1;
